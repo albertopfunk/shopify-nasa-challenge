@@ -4,6 +4,7 @@
 
 <script>
 	import { onMount } from "svelte";
+	import { VITE_NASA_KEY } from "$lib/Env.js";
 
 	let initialLoading = true;
 	let feedLoading = false;
@@ -55,7 +56,7 @@
 	});
 
 	async function initialFetch() {
-		const key = import.meta.env.VITE_NASA_KEY;
+		const key = VITE_NASA_KEY;
 		const response = await fetch(
 			`https://api.nasa.gov/planetary/apod?start_date=2021-08-01&end_date=2021-09-01&api_key=${key}`
 		);
@@ -117,7 +118,7 @@
 			normalizedEndMonth = `0${endMonth}`;
 		}
 
-		const key = import.meta.env.VITE_NASA_KEY;
+		const key = VITE_NASA_KEY;
 		const response = await fetch(
 			`https://api.nasa.gov/planetary/apod?start_date=${startYear}-${normalizedStartMonth}-01&end_date=${endYear}-${normalizedEndMonth}-01&api_key=${key}`
 		);
