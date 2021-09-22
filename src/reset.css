@@ -1,0 +1,88 @@
+html {
+	cursor: default;
+	box-sizing: border-box;
+	word-break: break-word;
+	background-color: ghostwhite;
+	color: rgb(0, 0, 0);
+	/*Prevent adjustments of font size Windows Phone/iOS*/
+	-ms-text-size-adjust: 100%;
+	-webkit-text-size-adjust: 100%;
+	/*Remove grey highlight on links in iOS*/
+	-webkit-tap-highlight-color: transparent;
+}
+
+*,
+*:before,
+*:after {
+	box-sizing: inherit;
+	position: relative;
+	color: inherit;
+	outline-width: 2.5px;
+	outline-color: rgb(0, 0, 0);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	html {
+		scroll-behavior: smooth;
+	}
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+
+/* For images to not be able to exceed their container */
+img {
+	max-width: 100%;
+}
+
+button,
+[type="button"],
+[type="reset"],
+[type="submit"] {
+	margin: 0;
+	padding: 0;
+	cursor: pointer;
+
+	/* prevent text highlight on click. */
+	user-select: none;
+	/* Correct the inability to style buttons in iOS and Safari. */
+	-webkit-appearance: button;
+	/* Single taps are dispatched immediately. */
+	-ms-touch-action: manipulation;
+	touch-action: manipulation;
+}
+
+/* aria cursor hints . */
+[aria-busy="true"] {
+	cursor: progress;
+}
+
+[aria-disabled="true"],
+[disabled] {
+	cursor: not-allowed;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+	margin: 0;
+	padding: 0;
+}
+
+.visually-hidden {
+	position: absolute;
+	clip: rect(0, 0, 0, 0);
+	height: 1px;
+	width: 1px;
+	margin: -1px;
+	padding: 0;
+	border: 0;
+	overflow: hidden;
+}
