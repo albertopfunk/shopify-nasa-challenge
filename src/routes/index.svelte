@@ -22,32 +22,6 @@
 
 	let feedCards;
 
-	// INITAL
-	// need to reverse array and add isLiked to each
-	// add to local storage
-
-	// LOAD MORE
-	// load next page
-	// remove last index
-	// reverse
-	// add isLiked
-	// update local sorage
-	// update page
-
-	// LOCAL STORAGE
-	// do not need to reverse array or add isLiked
-	// need to split array to only show page 1
-
-	// LOAD MORE
-	// check if next page is available
-	// if not then LOAD MORE INITIAL
-	// if yes, then split based on page
-	// update page
-
-	//
-
-	// local storages - page, feedCards
-
 	onMount(async () => {
 		// set initial cards with local storage if available
 		if (localStorage.getItem("feedCards")) {
@@ -65,6 +39,7 @@
 		// normalize cards
 		InitialFeedCards.forEach((card) => {
 			card.isLiked = false;
+			card.page = 1;
 		});
 		InitialFeedCards.reverse();
 
@@ -152,6 +127,7 @@
 		updatedResponse.pop();
 		updatedResponse.forEach((card) => {
 			card.isLiked = false;
+			card.page = newPage;
 		});
 		updatedResponse.reverse();
 
@@ -175,6 +151,29 @@
 		};
 		feedCards = [...feedCards, ...updatedResponse];
 	}
+
+	function likeCard(index, card) {
+		// update state
+		const newFeedCards = [...feedCards];
+		newFeedCards[index].isLiked = !newFeedCards[index].isLiked;
+		feedCards = newFeedCards;
+
+		// update local storage
+		const localFeedCards = JSON.parse(localStorage.getItem("feedCards"));
+
+		localFeedCards[card.page].forEach((item) => {
+			if (newFeedCards[index].date === item.date) {
+				item.isLiked = !item.isLiked;
+			}
+		});
+
+		const updatedFeedCards = {
+			...localFeedCards,
+			...{ [card.page]: localFeedCards[card.page] }
+		};
+
+		localStorage.setItem("feedCards", JSON.stringify(updatedFeedCards));
+	}
 </script>
 
 <svelte:head>
@@ -193,33 +192,44 @@
 		>
 			<h2 id="cards-heading">Cards Title</h2>
 
-			<!-- inital loading or map -->
+			{#if initialLoading}
+				<p>loading</p>
+			{:else}
+				{#each feedCards as feedCard, index}
+					<article
+						id={`nasa-card-${index}`}
+						class="nasa-card"
+						tabIndex="0"
+						aria-posinset={`${index + 1}`}
+						aria-setsize={feedCards.length}
+						aria-labelledby={`card-${index}-heading`}
+						aria-describedby={`card-${index}-image`}
+					>
+						<h3 id={`card-${index}-heading`}>
+							{feedCard.title}
+						</h3>
+						<p>Brought to you by NASA's Astronomy Photo of the Day</p>
 
-			<article
-				id="nasa-card-INDEX"
-				class="nasa-card"
-				tabIndex="0"
-				aria-posinset="INDEX+1"
-				aria-setsize="TOTAL_CARDS"
-				aria-labelledby="card-INDEX-heading"
-				aria-describedby="IMG_ALT"
-			>
-				<h3 id="card-INDEX-heading">Card Title</h3>
-				<p>Card subtitle</p>
+						<img id={`card-${index}-image`} src={feedCard.url} alt="" />
 
-				<img src="SRC" alt="ALT" />
+						<p>{feedCard.date}</p>
 
-				<h4>Description Title</h4>
+						<p>{feedCard.explanation}</p>
 
-				<p>Date</p>
-
-				<p>Description</p>
-
-				<button type="button">
-					<span>visually hidden "like image"</span>
-					<span>like icon</span>
-				</button>
-			</article>
+						<button
+							type="button"
+							class:liked={feedCard.isLiked}
+							on:click={() => likeCard(index, feedCard)}
+						>
+							{#if feedCard.isLiked}
+								liked!
+							{:else}
+								like
+							{/if}
+						</button>
+					</article>
+				{/each}
+			{/if}
 		</div>
 
 		<button type="button" on:click={loadMoreCards}> Load More </button>
