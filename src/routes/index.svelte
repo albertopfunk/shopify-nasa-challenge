@@ -5,6 +5,10 @@
 <script>
 	import { onMount } from "svelte";
 	import { VITE_NASA_KEY } from "$lib/Env.js";
+	import LikeIcon from "$lib/icons/LikeIcon.svelte";
+	import UnlikeIcon from "$lib/icons/UnlikeIcon.svelte";
+	import LoadingIcon from "$lib/icons/LoadingIcon.svelte";
+	import Spacer from "$lib/Spacer.svelte";
 
 	let initialLoading = true;
 	let feedLoading = false;
@@ -107,6 +111,9 @@
 			}
 		}
 
+		// set loading
+		feedLoading = true;
+
 		// add 0 to dates for API
 		let normalizedStartMonth = startMonth;
 		if (startMonth < 10) {
@@ -151,6 +158,7 @@
 			month: endMonth
 		};
 		feedCards = [...feedCards, ...updatedResponse];
+		feedLoading = false;
 	}
 
 	function likeCard(index, card) {
@@ -183,72 +191,103 @@
 
 <div class="main-container">
 	<main>
-		<h1>NASA to the Moon!</h1>
-
+		<h1>NASA Photography</h1>
+		<Spacer size="xlg" />
 		<div
 			class="nasa-cards-feed"
 			role="feed"
-			aria-busy="ISLOADING"
+			aria-busy={initialLoading || feedLoading}
 			aria-labelledby="cards-heading"
 		>
-			<h2 id="cards-heading">Cards Title</h2>
-
-			{#if initialLoading}
-				<p>loading</p>
-			{:else}
-				{#each feedCards as feedCard, index}
-					<article
-						id={`nasa-card-${index}`}
-						class="nasa-card"
-						tabIndex="0"
-						aria-posinset={`${index + 1}`}
-						aria-setsize={feedCards.length}
-						aria-labelledby={`card-${index}-heading`}
-						aria-describedby={`card-${index}-image`}
-					>
-						<h3 id={`card-${index}-heading`}>
-							{feedCard.title}
-						</h3>
-						<p>Brought to you by NASA's Astronomy Photo of the Day</p>
-
-						<img id={`card-${index}-image`} src={feedCard.url} alt="" />
-
-						<p>{feedCard.date}</p>
-
-						<p>{feedCard.explanation}</p>
-
-						<button
-							type="button"
-							class:liked={feedCard.isLiked}
-							on:click={() => likeCard(index, feedCard)}
+			<h2 id="cards-heading">NASA's Astronomy Photos of the Day</h2>
+			<Spacer size="md" />
+			<div class="nasa-cards-grid">
+				{#if initialLoading}
+					<p class="visually-hidden">loading</p>
+					<LoadingIcon lg />
+				{:else}
+					{#each feedCards as feedCard, index}
+						<article
+							id={`nasa-card-${index}`}
+							class="nasa-card"
+							tabIndex="0"
+							aria-posinset={`${index + 1}`}
+							aria-setsize={feedCards.length}
+							aria-labelledby={`card-${index}-heading`}
+							aria-describedby={`card-${index}-description`}
 						>
-							{#if feedCard.isLiked}
-								liked!
-							{:else}
-								like
-							{/if}
-						</button>
-					</article>
-				{/each}
-			{/if}
-		</div>
+							<div class="nasa-card-image">
+								<img id={`card-${index}-image`} src={feedCard.url} alt="" />
+							</div>
 
-		<button type="button" on:click={loadMoreCards}> Load More </button>
+							<div class="nasa-card-content">
+								<Spacer size="md" />
+								<h3 id={`card-${index}-heading`}>
+									{feedCard.title}
+								</h3>
+								<Spacer size="xsm" />
+								<p>{feedCard.date}</p>
+								<Spacer size="sm" />
+								<p id={`card-${index}-description`}>{feedCard.explanation}</p>
+								<Spacer size="md" />
+								<button
+									type="button"
+									on:click={() => likeCard(index, feedCard)}
+								>
+									{#if feedCard.isLiked}
+										<span class="visually-hidden">unlike photo</span>
+										<LikeIcon />
+									{:else}
+										<span class="visually-hidden">like photo</span>
+										<UnlikeIcon />
+									{/if}
+								</button>
+							</div>
+						</article>
+					{/each}
+				{/if}
+			</div>
+			<Spacer size="xlg" />
+			<button
+				class="load-more-button"
+				disabled={initialLoading || feedLoading}
+				type="button"
+				on:click={loadMoreCards}
+			>
+				{#if feedLoading}
+					<span> Loading </span>
+					<span>
+						<LoadingIcon />
+					</span>
+				{:else}
+					Load More
+				{/if}
+			</button>
+			<Spacer size="xlg" />
+		</div>
 	</main>
 
 	<footer>
-		<p>Built with NASA by Alberto Preciado</p>
+		<p>Built by Alberto Preciado</p>
+
+		<a
+			href="https://github.com/albertopfunk/shopify-nasa-challenge"
+			target="_blank"
+			rel="noreferrer"
+			>Visit Project Repo <span class="visually-hidden">opens in new tab</span
+			></a
+		>
 	</footer>
 </div>
 
 <style>
 	.main-container {
 		min-height: 100vh;
-		padding: 0 0.5rem;
 		display: flex;
 		flex-direction: column;
 		justify-content: space-between;
 		align-items: stretch;
+		text-align: center;
 	}
 
 	main {
@@ -259,14 +298,62 @@
 		flex-shrink: 0;
 		width: 100%;
 		height: 75px;
+		display: flex;
+		justify-content: space-evenly;
+		align-items: center;
 		border-top: 1px solid #eaeaea;
+	}
+
+	.load-more-button {
+		width: 100%;
+		max-width: 200px;
 		display: flex;
 		justify-content: center;
 		align-items: center;
+		gap: 5px;
+		background-color: transparent;
+		padding: 7px;
+		margin: 0 auto;
+		border: 3px solid black;
+	}
+
+	.nasa-cards-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(min(600px, 100%), 1fr));
+		justify-items: center;
+		align-items: start;
+		grid-gap: 50px;
 	}
 
 	.nasa-card {
+		max-width: 850px;
+		border-radius: 10px;
+	}
+
+	.nasa-card-image {
+		display: flex;
+		justify-content: center;
+	}
+
+	.nasa-card-content {
+		padding: 0 10px;
 		border: 1px solid #eaeaea;
+		border-top: none;
+	}
+
+	.nasa-card-content p {
+		max-width: 750px;
+		margin: 0 auto;
+		line-height: 1.5;
+	}
+
+	.nasa-card-content button {
+		height: 45px;
+		width: 45px;
+		display: flex;
+		background-color: transparent;
+		padding: 3px;
+		border: none;
 		border-radius: 10px;
 	}
 </style>
