@@ -230,7 +230,9 @@
 
 <div class="main-container">
 	<main>
-		<h1>NASA Photography</h1>
+		<div class="title-container">
+			<h1>NASA Photography</h1>
+		</div>
 		<Spacer size="xlg" />
 		<div
 			class="nasa-cards-feed"
@@ -336,6 +338,14 @@
 		padding: 0.5rem 0;
 	}
 
+	.title-container {
+		height: 75px;
+		border-bottom: 1px solid #eaeaea;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
 	footer {
 		flex-shrink: 0;
 		width: 100%;
@@ -344,6 +354,14 @@
 		justify-content: space-evenly;
 		align-items: center;
 		border-top: 1px solid #eaeaea;
+	}
+
+	footer a:hover {
+		color: #0645ad;
+	}
+
+	footer a:active {
+		color: #0963f6;
 	}
 
 	.load-more-button {
