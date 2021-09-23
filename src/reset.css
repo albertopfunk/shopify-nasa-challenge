@@ -18,7 +18,7 @@ html {
 	position: relative;
 	color: inherit;
 	outline-width: 2.5px;
-	outline-color: rgb(0, 0, 0);
+	outline-color: #1b3c54;
 }
 
 @media (prefers-reduced-motion: no-preference) {

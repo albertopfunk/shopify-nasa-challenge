@@ -26,6 +26,7 @@
 	};
 
 	let feedCards;
+	let nasaCardsEl = [];
 
 	onMount(async () => {
 		// set initial cards with local storage if available
@@ -161,6 +162,44 @@
 		feedLoading = false;
 	}
 
+	function cardActions(e, index) {
+		// ctrl+home
+		// first card
+		if (e.ctrlKey && e.keyCode === 36) {
+			e.preventDefault();
+			nasaCardsEl[0].focus();
+		}
+
+		// ctrl+end
+		// last card
+		if (e.ctrlKey && e.keyCode === 35) {
+			e.preventDefault();
+			nasaCardsEl[nasaCardsEl.length - 1].focus();
+		}
+
+		// page up
+		// previous
+		if (e.keyCode === 33) {
+			e.preventDefault();
+			if (index === 0) {
+				nasaCardsEl[nasaCardsEl.length - 1].focus();
+				return;
+			}
+			nasaCardsEl[index - 1].focus();
+		}
+
+		// page down
+		// next
+		if (e.keyCode === 34) {
+			e.preventDefault();
+			if (index === nasaCardsEl.length - 1) {
+				nasaCardsEl[0].focus();
+				return;
+			}
+			nasaCardsEl[index + 1].focus();
+		}
+	}
+
 	function likeCard(index, card) {
 		// update state
 		const newFeedCards = [...feedCards];
@@ -208,6 +247,7 @@
 				{:else}
 					{#each feedCards as feedCard, index}
 						<article
+							bind:this={nasaCardsEl[index]}
 							id={`nasa-card-${index}`}
 							class="nasa-card"
 							tabIndex="0"
@@ -215,6 +255,7 @@
 							aria-setsize={feedCards.length}
 							aria-labelledby={`card-${index}-heading`}
 							aria-describedby={`card-${index}-description`}
+							on:keydown={(e) => cardActions(e, index)}
 						>
 							<div class="nasa-card-image">
 								<img id={`card-${index}-image`} src={feedCard.url} alt="" />
@@ -232,6 +273,7 @@
 								<Spacer size="md" />
 								<button
 									type="button"
+									class="like-button"
 									on:click={() => likeCard(index, feedCard)}
 								>
 									{#if feedCard.isLiked}
@@ -317,6 +359,20 @@
 		border: 3px solid black;
 	}
 
+	.load-more-button:focus,
+	.load-more-button:hover {
+		outline-offset: 2px;
+		outline-width: 3px;
+		outline-style: solid;
+		color: #1b3c54;
+	}
+
+	.load-more-button:active {
+		outline-offset: 0;
+		outline-width: 0;
+		outline-style: solid;
+	}
+
 	.nasa-cards-grid {
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(min(600px, 100%), 1fr));
@@ -347,7 +403,7 @@
 		line-height: 1.5;
 	}
 
-	.nasa-card-content button {
+	.like-button {
 		height: 45px;
 		width: 45px;
 		display: flex;
@@ -355,5 +411,9 @@
 		padding: 3px;
 		border: none;
 		border-radius: 10px;
+	}
+
+	.like-button:hover :global(svg) {
+		fill: #1b3c54;
 	}
 </style>
